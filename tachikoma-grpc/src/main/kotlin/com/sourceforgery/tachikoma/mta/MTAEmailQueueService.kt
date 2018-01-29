@@ -47,7 +47,7 @@ private constructor(
 ) {
     fun getEmails(responseObserver: StreamObserver<EmailMessage>): StreamObserver<MTAQueuedNotification> {
         LOGGER.info { "MTA connected" }
-        val serverCallStreamObserver = responseObserver as ServerCallStreamObserver
+        val serverCallStreamObserver = responseObserver as? ServerCallStreamObserver
         val future = mqSequenceFactory.listenForOutgoingEmails(authentication.mailDomain, {
             val email = emailDAO.fetchEmailData(EmailId(it.emailId))
             if (email == null) {
@@ -64,7 +64,8 @@ private constructor(
             }
         })
         future.addListener(Runnable {
-            if (serverCallStreamObserver.isCancelled) {
+            val cancelled = serverCallStreamObserver?.isCancelled ?: true
+            if (!cancelled) {
                 responseObserver.onCompleted()
             }
         }, responseCloser)

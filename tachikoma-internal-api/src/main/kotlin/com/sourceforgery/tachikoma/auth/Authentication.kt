@@ -11,6 +11,5 @@ interface Authentication {
     fun requireFrontend(): AccountId
     fun requireFrontendAdmin(): AccountId
     fun requireBackend(): AccountId
-    fun requireAdmin(): AccountId
     val mailDomain: MailDomain
 }
